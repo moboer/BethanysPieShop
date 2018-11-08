@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using BethanysPieShop.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace BethanysPieShop
 {
@@ -26,9 +27,15 @@ namespace BethanysPieShop
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>
-                (options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                (options => options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>();
+
             //注册模拟数据
             services.AddTransient<IPieRepository, PieRepository>();
+            services.AddTransient<IFeedbackRepository, FeedbackRepository>();
             //注册mvc服务
             services.AddMvc();
         }
@@ -44,6 +51,8 @@ namespace BethanysPieShop
             app.UseStaticFiles();
             ////使用mvc和默认路由方式
             //app.UseMvcWithDefaultRoute();
+            //
+            app.UseAuthentication();
             //
             app.UseMvc(
                route =>
